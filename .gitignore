@@ -1,3 +1,9 @@
-__pycache__/
 .env
+
+_resources/
+logs/
+sql/
+src_rdv/
+
+__pycache__/
 .venv/

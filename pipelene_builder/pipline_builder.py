@@ -1,13 +1,7 @@
-import logging
 import os
 import re
 
 import paramiko
-from dotenv import load_dotenv
-
-load_dotenv()
-
-logger = logging.getLogger(__name__)
 
 
 def remove_ansi_escape_codes(text):
@@ -16,42 +10,44 @@ def remove_ansi_escape_codes(text):
     return ansi_escape.sub('', text)
 
 
-def copy_files(host, username, ssh_key_path, flow_dir, remote_dir, logger):
+def copy_files(host, username, password, flow_dir, remote_dir, logger):
     """
     Copy pipeline files to the remote server
     """
     ssh = paramiko.SSHClient()
     ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-    logger.info(f"Connecting to server: {host}, with user: {username}")
-    ssh.connect(host, username=username, key_filename=ssh_key_path)
-    logger.info("Connected to the server")
 
-    sftp = ssh.open_sftp()
+    try:
+        logger.info(f"Connecting to server: {host}, with user: {username}")
+        ssh.connect(host, username=username, password=password)
+        logger.info("Connected to the server")
 
-    for root, _, files in os.walk(flow_dir):
-        remote_path = os.path.join(remote_dir, os.path.relpath(root, flow_dir)).replace('\\', '/')
+        sftp = ssh.open_sftp()
 
-        for file in files:
-            if file.startswith("hub_"):
-                logger.warning(f"File {file} skipped")
-                continue
-            local_file = os.path.join(root, file)
-            remote_file = os.path.join(remote_path, file).replace('\\', '/')
-            sftp.put(local_file, remote_file)
-            logger.info(f"File {file} copied to remote server")
+        for root, _, files in os.walk(flow_dir):
+            remote_path = os.path.join(remote_dir, os.path.relpath(root, flow_dir)).replace('\\', '/')
 
-    sftp.close()
-    ssh.close()
-    logger.info("Files copied successfully")
+            for file in files:
+                if file.startswith("hub_"):
+                    logger.warning(f"File {file} skipped")
+                    continue
+                local_file = os.path.join(root, file)
+                remote_file = os.path.join(remote_path, file).replace('\\', '/')
+                sftp.put(local_file, remote_file)
+                logger.info(f"File {file} copied to remote server")
+        sftp.close()
+        ssh.close()
+    except Exception as e:
+        logger.error(f"Error happened: {e}. Ensure your VPN is on.")
 
 
-def build_pipeline(host, username, ssh_key_path, dev_env, logger):
+def build_pipeline(host, username, password, dev_env, logger):
     """
     Run the pipeline build on the remote server
     """
     ssh = paramiko.SSHClient()
     ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-    ssh.connect(host, username=username, key_filename=ssh_key_path)
+    ssh.connect(host, username=username, password=password)
 
     os.makedirs("logs", exist_ok=True)
 

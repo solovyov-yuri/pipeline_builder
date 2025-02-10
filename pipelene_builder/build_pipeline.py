@@ -4,8 +4,11 @@ import sys
 
 from db_entities_creator import (create_or_update_entities,
                                  create_oracle_entities)
+from dotenv import load_dotenv
 from pipline_builder import build_pipeline, copy_files
-from resource_creator import create_ceh_resources, create_uni_resources
+from resource_creator import create_resources
+
+load_dotenv()
 
 # Configuration
 DEV_ENVIRONMENTS = {
@@ -38,20 +41,19 @@ DEV_ENVIRONMENTS = {
 # Development environment
 DEV_ENV = sys.argv[1] if len(sys.argv) > 1 else "develop"
 
-if DEV_ENV not in DEV_ENVIRONMENTS:
-    print(f"❌ Unknown environment: {DEV_ENV}. Available: {list(DEV_ENVIRONMENTS.keys())}")
-    sys.exit(1)
-
 # Server connection
 HOST = os.getenv("HOST")
 USER = os.getenv("USER")
 PORT = os.getenv("PORT")
 SSH_KEY_PATH = os.getenv("SSH_KEY_PATH")
+SERVER_PASS = os.getenv("SERVER_PASS")
 
 # Directories
 FLOW_DIR = f"{os.getcwd()}/src_rdv"
 REMOTE_DIR = DEV_ENVIRONMENTS[DEV_ENV]["dir"]
 DDL_DIR = os.getenv("DDL_DIR")
+UNI_RES_DIR = os.getenv("UNI_RES_DIR")
+CEH_RES_DIR = os.getenv("CEH_RES_DIR")
 
 CERT_PATH = os.getenv("CERT_PATH")
 
@@ -83,16 +85,12 @@ def setup_logging():
 def validate_env(logger):
     """Check environment variables"""
     required_vars = ["HOST", "USER", "PORT", "SSH_KEY_PATH", "CERT_PATH"]
-    required_db_vars = [
-        "DEV_ORACLE_USER", "DEV_ORACLE_PASS", "DEV_ORACLE_HOST",
-        "DEV_ORACLE_PORT", "DEV_ORACLE_SERVICE_NAME",
-        "DEV_GP_DB", "DEV_GP_USER", "DEV_GP_PASS", "DEV_GP_DB_HOST", "DEV_GP_PORT"
-    ]
+    required_dirs = ["DDL_DIR", "UNI_RES_DIR", "CEH_RES_DIR"]
+    required_db_configs = []
 
-    for var in required_vars + required_db_vars:
+    for var in required_vars + required_dirs + required_db_configs:
         if not os.getenv(var):
-            logger.error(f"❌ Environment variable {var} is not set!")
-            sys.exit(1)
+            logger.warning(f"⚠️ Environment variable {var} is not set!")
 
 
 def main():
@@ -100,22 +98,27 @@ def main():
     global logger
     logger.info("Builder start working...")
 
-    copy_files(HOST, USER, SSH_KEY_PATH, FLOW_DIR, REMOTE_DIR, logger)
+    # Copiy files to remote server
+    copy_files(HOST, USER, SERVER_PASS, FLOW_DIR, REMOTE_DIR, logger)
 
+    # Create UNI resources
     if UNI_RES:
-        create_uni_resources(api_url=UNI_RES, resources_folder='_resources', cert_path=CERT_PATH, logger=logger)
+        create_resources(api_url=UNI_RES, resources_folder=UNI_RES_DIR, cert_path=CERT_PATH, logger=logger)
     else:
         logger.warning("⚠️ UNI_RES is not set! Skipping resource creation.")
 
+    # Create CEH resources
     if CEH_RES:
-        create_ceh_resources(api_url=CEH_RES, resources_folder='_resources', cert_path=CERT_PATH, logger=logger)
+        create_resources(api_url=CEH_RES, resources_folder=CEH_RES_DIR, cert_path=CERT_PATH, logger=logger)
     else:
         logger.warning("⚠️ CEH_RES is not set! Skipping resource creation.")
 
+    # Create tables in database
     create_or_update_entities(DDL_DIR, GP_CONFIG, logger)
     create_oracle_entities(DDL_DIR, ORACLE_CONFIG, logger)
 
-    build_pipeline(HOST, USER, SSH_KEY_PATH, DEV_ENV, logger)
+    # Start remote build via ssh
+    build_pipeline(HOST, USER, SERVER_PASS, DEV_ENV, logger)
 
 
 if __name__ == "__main__":

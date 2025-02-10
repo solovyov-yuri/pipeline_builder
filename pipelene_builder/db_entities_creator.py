@@ -27,8 +27,6 @@ def create_or_update_entities(ddl_dir, gp_db_config, logger):
         conn.autocommit = True  # Автоматическое применение транзакций
         cursor = conn.cursor()
 
-        logger.info("Conn success!")
-
         for sql_file in sql_files:
             file_path = os.path.join(gp_ddl_dir, sql_file)
             print(file_path)
@@ -49,8 +47,6 @@ def create_oracle_entities(ddl_dir, oracle_config, logger):
     oracle_ddl_dir = f"{ddl_dir}\\oracle"
     sql_files = sorted(file for file in os.listdir(oracle_ddl_dir) if file.endswith(".sql"))
     logger.info(f"Found files: {sql_files}")
-
-    logger.info(oracle_config)
 
     if not sql_files:
         logger.warning("Нет SQL-файлов для выполнения.")

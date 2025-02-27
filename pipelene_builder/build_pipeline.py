@@ -1,4 +1,4 @@
-import logging
+from logger import LoggerConfig
 import os
 import sys
 
@@ -7,6 +7,8 @@ from db_entities_creator import create_or_update_entities, create_oracle_entitie
 from pipline_builder import build_pipeline, copy_files
 from resource_creator import create_resources
 
+
+logger = LoggerConfig.get_logger("Pipeline Builder")
 
 # Load configuration
 # Development environment
@@ -86,18 +88,6 @@ remote_dir = config.get("directories.remote")[dev_env]
 # CEH_RES = DEV_ENVIRONMENTS[DEV_ENV].get("ceh_res_prov", "")
 
 
-def setup_logging():
-    """Configure logging"""
-    logger = logging.getLogger(__name__)
-    logger.setLevel(logging.INFO)
-    console_handler = logging.StreamHandler()
-    console_handler.setLevel(logging.INFO)
-    formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(name)s - %(message)s")
-    console_handler.setFormatter(formatter)
-    logger.addHandler(console_handler)
-    return logger
-
-
 # def validate_env(logger):
 #     """Check environment variables"""
 #     required_vars = ["HOST", "USER", "PORT", "SSH_KEY_PATH", "CERT_PATH"]
@@ -138,6 +128,5 @@ def main():
 
 
 if __name__ == "__main__":
-    logger = setup_logging()
     # validate_env(logger)
     main()

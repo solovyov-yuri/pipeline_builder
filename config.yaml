@@ -1,0 +1,52 @@
+server:
+  host: "example.com"
+  user: "deploy_user"
+  password: "deploy_pass"
+  port: 22
+  ssh_key_path: "/path/to/key"
+
+directories:
+  local:
+    log: "/path/to/log"
+    ddl: "/path/to/ddl"
+    uni_res: "/path/to/uni_res"
+    ceh_res: "/path/to/ceh_res"
+  remote:
+    zi5: "/app/frm_instances/airflow_zi5/dags/general_ledger/src_rdv"
+    develop: "/app/frm_instances/airflow_develop/dags/general_ledger/src_rdv"
+
+resource_provider:
+  zi5:
+    uni_res: "http://zi5_uni_res.example.com"
+    ceh_res: "http://zi5_ceh_res.example.com"
+  develop:
+    uni_res: "http://develop_uni_res.example.com"
+    ceh_res: "http://develop_ceh_res.example.com"
+
+database:
+  oracle:
+    user: "oracle_user"
+    password: "oracle_pass"
+    host: "oracle.example.com"
+    port: 1521
+    service_name: "XE"
+
+  greenplum:
+    zi5:
+      dbname: "gp_db"
+      user: "gp_user"
+      password: "gp_pass"
+      host: "gp.example.com"
+      port: 5432
+    develop:
+      dbname: "gp_db"
+      user: "gp_user"
+      password: "gp_pass"
+      host: "gp.example.com"
+      port: 5432
+
+ssl:
+  cert_path: "/path/to/cert"
+
+ssh:
+  key_path: "/path/to/key"

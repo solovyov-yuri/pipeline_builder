@@ -7,3 +7,5 @@ src_rdv/
 
 __pycache__/
 .venv/
+
+backlog.md

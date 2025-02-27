@@ -8,7 +8,7 @@
 
 ### Начало работы.
 1. Копируем распакованый архив в корень проекта.
-2. Переименовывваем .env.example в .env. Заполняем необходимые переменные.
+2. Переименовывваем `config.example.yaml` в `config.example.yaml`. Заполняем необходимые переменные.
 3. Создаем окружение.
 ``` cmd
 python -m venv .venv
@@ -18,7 +18,7 @@ pip install -r .\requirements.txt
 ```
 4. Создаем структуру проекта. Если у вас уже есть, то проследите, чтобы соответствовала.
 ``` cmd
-mkdir _resources\uni
+mkdir _resources\uni\ods
 mkdir _resources\ceh\rdv
 mkdir sql\ddl\gp
 mkdir sql\ddl\oracle

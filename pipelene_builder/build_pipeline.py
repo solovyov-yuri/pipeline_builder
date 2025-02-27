@@ -9,6 +9,9 @@ from resource_creator import create_resources
 
 
 # Load configuration
+# Development environment
+dev_env = sys.argv[1] if len(sys.argv) > 1 else "develop"
+
 # Database connection settings
 gp_config = config.get("database.greenplum")
 oracle_config = config.get("database.oracle")
@@ -18,11 +21,11 @@ uni_res = config.get("resource_providers.uni")
 ceh_res = config.get("resource_providers.ceh")
 
 # Server connection
-host = config.get("server.host")
-user = config.get("server.user")
-port = config.get("server.port")
-ssh_key_path = config.get("server.ssh_key_path")
-server_pass = config.get("server.password")
+server_conn = config.get("server")
+
+# Directories
+flow_dir = f"{os.getcwd()}/src_rdv"
+remote_dir = config.get("directories.remote")[dev_env]
 
 
 # DEV_ENVIRONMENTS = {
@@ -63,7 +66,6 @@ server_pass = config.get("server.password")
 # SERVER_PASS = os.getenv("SERVER_PASS")
 
 # # Directories
-# FLOW_DIR = f"{os.getcwd()}/src_rdv"
 # REMOTE_DIR = DEV_ENVIRONMENTS[DEV_ENV]["dir"]
 # DDL_DIR = os.getenv("DDL_DIR")
 # UNI_RES_DIR = os.getenv("UNI_RES_DIR")
@@ -84,16 +86,16 @@ server_pass = config.get("server.password")
 # CEH_RES = DEV_ENVIRONMENTS[DEV_ENV].get("ceh_res_prov", "")
 
 
-# def setup_logging():
-#     """Configure logging"""
-#     logger = logging.getLogger(__name__)
-#     logger.setLevel(logging.INFO)
-#     console_handler = logging.StreamHandler()
-#     console_handler.setLevel(logging.INFO)
-#     formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(name)s - %(message)s")
-#     console_handler.setFormatter(formatter)
-#     logger.addHandler(console_handler)
-#     return logger
+def setup_logging():
+    """Configure logging"""
+    logger = logging.getLogger(__name__)
+    logger.setLevel(logging.INFO)
+    console_handler = logging.StreamHandler()
+    console_handler.setLevel(logging.INFO)
+    formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(name)s - %(message)s")
+    console_handler.setFormatter(formatter)
+    logger.addHandler(console_handler)
+    return logger
 
 
 # def validate_env(logger):
@@ -107,35 +109,35 @@ server_pass = config.get("server.password")
 #             logger.warning(f"⚠️ Environment variable {var} is not set!")
 
 
-# def main():
-#     """Main logic"""
-#     global logger
-#     logger.info("Builder start working...")
+def main():
+    """Main logic"""
+    global logger
+    logger.info("Builder start working...")
 
-#     # Copiy files to remote server
-#     copy_files(HOST, USER, SERVER_PASS, FLOW_DIR, REMOTE_DIR, logger)
+    # Copiy files to remote server
+    copy_files(server_conn, flow_dir, remote_dir, logger)
 
-#     # Create UNI resources
-#     if UNI_RES:
-#         create_resources(api_url=UNI_RES, resources_folder=UNI_RES_DIR, cert_path=CERT_PATH, logger=logger)
-#     else:
-#         logger.warning("⚠️ UNI_RES is not set! Skipping resource creation.")
+    # # Create UNI resources
+    # if UNI_RES:
+    #     create_resources(api_url=UNI_RES, resources_folder=UNI_RES_DIR, cert_path=CERT_PATH, logger=logger)
+    # else:
+    #     logger.warning("⚠️ UNI_RES is not set! Skipping resource creation.")
 
-#     # Create CEH resources
-#     if CEH_RES:
-#         create_resources(api_url=CEH_RES, resources_folder=CEH_RES_DIR, cert_path=CERT_PATH, logger=logger)
-#     else:
-#         logger.warning("⚠️ CEH_RES is not set! Skipping resource creation.")
+    # # Create CEH resources
+    # if CEH_RES:
+    #     create_resources(api_url=CEH_RES, resources_folder=CEH_RES_DIR, cert_path=CERT_PATH, logger=logger)
+    # else:
+    #     logger.warning("⚠️ CEH_RES is not set! Skipping resource creation.")
 
-#     # Create tables in database
-#     create_or_update_entities(DDL_DIR, GP_CONFIG, logger)
-#     create_oracle_entities(DDL_DIR, ORACLE_CONFIG, logger)
+    # # Create tables in database
+    # create_or_update_entities(DDL_DIR, GP_CONFIG, logger)
+    # create_oracle_entities(DDL_DIR, ORACLE_CONFIG, logger)
 
-#     # Start remote build via ssh
-#     build_pipeline(HOST, USER, SERVER_PASS, DEV_ENV, logger)
+    # # Start remote build via ssh
+    # build_pipeline(HOST, USER, SERVER_PASS, DEV_ENV, logger)
 
 
-# if __name__ == "__main__":
-#     logger = setup_logging()
-#     validate_env(logger)
-#     main()
+if __name__ == "__main__":
+    logger = setup_logging()
+    # validate_env(logger)
+    main()

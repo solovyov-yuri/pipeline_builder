@@ -1,44 +1,53 @@
 import os
 import re
+from logging import Logger
+from socket import gaierror
 
 import paramiko
 
 
 def remove_ansi_escape_codes(text):
     """Удаляет ANSI escape-коды из текста."""
-    ansi_escape = re.compile(r'\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])')
-    return ansi_escape.sub('', text)
+    ansi_escape = re.compile(r"\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])")
+    return ansi_escape.sub("", text)
 
 
-def copy_files(host, username, password, flow_dir, remote_dir, logger):
+def copy_files(server_config: dict[str, int], flow_dir: str, remote_dir: str, logger: Logger):
     """
     Copy pipeline files to the remote server
     """
+    logger.info("🚀 Starts coping files.")
+
     ssh = paramiko.SSHClient()
     ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 
     try:
-        logger.info(f"Connecting to server: {host}, with user: {username}")
-        ssh.connect(host, username=username, password=password)
-        logger.info("Connected to the server")
+        logger.info(f"Connecting to server: {server_config["host"]}, with user: {server_config["user"]}")
+        ssh.connect(
+            hostname=server_config["host"],
+            username=server_config["user"],
+            password=server_config["password"],
+        )
+        logger.info("✅ Connected to the server.")
 
         sftp = ssh.open_sftp()
 
         for root, _, files in os.walk(flow_dir):
-            remote_path = os.path.join(remote_dir, os.path.relpath(root, flow_dir)).replace('\\', '/')
+            remote_path = os.path.join(remote_dir, os.path.relpath(root, flow_dir)).replace("\\", "/")
 
             for file in files:
                 if file.startswith("hub_"):
-                    logger.warning(f"File {file} skipped")
+                    logger.warning(f"⚠️ File {file} skipped")
                     continue
                 local_file = os.path.join(root, file)
-                remote_file = os.path.join(remote_path, file).replace('\\', '/')
+                remote_file = os.path.join(remote_path, file).replace("\\", "/")
                 sftp.put(local_file, remote_file)
-                logger.info(f"File {file} copied to remote server")
+                logger.info(f"✅ File {file} copied to remote server")
         sftp.close()
         ssh.close()
-    except Exception as e:
-        logger.error(f"Error happened: {e}. Ensure your VPN is on.")
+
+    except gaierror as e:
+        logger.error(f"❌ Connection error: {e}. Ensure your VPN is on and the host address is correct.")
 
 
 def build_pipeline(host, username, password, dev_env, logger):

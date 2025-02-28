@@ -17,7 +17,6 @@ dev_env = sys.argv[1] if len(sys.argv) > 1 else "develop"
 gp_config = config.get(f"database.greenplum.{dev_env}")
 oracle_config = config.get("database.oracle")
 
-print(gp_config)
 
 # Resource providers api's
 uni_res_url = config.get(f"resource_provider.{dev_env}.uni_res")

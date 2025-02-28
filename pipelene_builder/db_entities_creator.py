@@ -55,7 +55,6 @@ def create_oracle_entities(ddl_dir, oracle_config, logger):
     try:
         conn = oracledb.connect(**oracle_config)
         cursor = conn.cursor()
-        logger.info("Conn success!")
 
         for sql_file in sql_files:
             file_path = os.path.join(oracle_ddl_dir, sql_file)

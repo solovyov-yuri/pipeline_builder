@@ -8,10 +8,10 @@ server:
 directories:
   local:
     flow: "src_rdv"
-    log: "log"
-    ddl: "/path/to/ddl"
-    uni_res: "/path/to/uni_res"
-    ceh_res: "/path/to/ceh_res"
+    log: "logs"
+    ddl: "sql/ddl"
+    uni_res: "_resources/uni"
+    ceh_res: "_resources/ceh"
   remote:
     zi5: "/app/frm_instances/airflow_zi5/dags/general_ledger/src_rdv"
     develop: "/app/frm_instances/airflow_develop/dags/general_ledger/src_rdv"

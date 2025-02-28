@@ -1,13 +1,11 @@
-from logger import LoggerConfig
 import os
 import sys
 
 from config import config
-
-# from db_entities_creator import create_or_update_entities, create_oracle_entities
-# from pipline_builder import build_pipeline, copy_files, get_files_from_dir
+from db_entities_creator import create_gp_entities, create_oracle_entities
+from logger import LoggerConfig
+from pipline_builder import build_pipeline, copy_files
 from resource_creator import create_resources
-
 
 logger = LoggerConfig.get_logger("Pipeline Builder")
 
@@ -31,6 +29,7 @@ flow_dir = config.get("directories.local.flow")
 remote_dir = config.get("directories.remote")[dev_env]
 uni_res_dir = config.get("directories.local.uni_res")
 ceh_res_dir = config.get("directories.local.ceh_res")
+ddl_dir = config.get("directories.local.ddl")
 
 ssl_cert_path = config.get("ssl.cert_path")
 
@@ -107,18 +106,18 @@ def main():
     """Main logic"""
     logger.info("Builder start working...")
 
-    # Copiy files to remote server
+    # # Copiy files to remote server
     # copy_files(server_conn, flow_dir, remote_dir, logger)
 
-    # Create UNI resources
-    create_resources(uni_res_url, uni_res_dir, logger, ssl_cert_path)
+    # # Create UNI resources
+    # create_resources(uni_res_url, uni_res_dir, logger, ssl_cert_path)
 
-    # # Create CEH resources
-    create_resources(ceh_res_url, ceh_res_dir, logger, ssl_cert_path)
+    # # # Create CEH resources
+    # create_resources(ceh_res_url, ceh_res_dir, logger, ssl_cert_path)
 
-    # # Create tables in database
-    # create_or_update_entities(DDL_DIR, GP_CONFIG, logger)
-    # create_oracle_entities(DDL_DIR, ORACLE_CONFIG, logger)
+    # Create tables in database
+    create_gp_entities(ddl_dir, gp_config, logger)
+    create_oracle_entities(ddl_dir, oracle_config, logger)
 
     # # Start remote build via ssh
     # build_pipeline(HOST, USER, SERVER_PASS, DEV_ENV, logger)

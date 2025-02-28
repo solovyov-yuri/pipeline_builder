@@ -1,13 +1,12 @@
-from logger import LoggerConfig
 import os
 import sys
 
 from config import config
+from logger import LoggerConfig
 
-# from db_entities_creator import create_or_update_entities, create_oracle_entities
-# from pipline_builder import build_pipeline, copy_files, get_files_from_dir
+from db_entities_creator import create_or_update_entities, create_oracle_entities
+from pipline_builder import build_pipeline, build_pipeline_with_progress, copy_files
 from resource_creator import create_resources
-
 
 logger = LoggerConfig.get_logger("Pipeline Builder")
 
@@ -120,10 +119,9 @@ def main():
     # create_or_update_entities(DDL_DIR, GP_CONFIG, logger)
     # create_oracle_entities(DDL_DIR, ORACLE_CONFIG, logger)
 
-    # # Start remote build via ssh
-    # build_pipeline(HOST, USER, SERVER_PASS, DEV_ENV, logger)
+    # Start remote build via ssh
+    build_pipeline_with_progress(server_conn, dev_env, logger)
 
 
 if __name__ == "__main__":
-    # validate_env(logger)
     main()

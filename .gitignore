@@ -1,4 +1,5 @@
-.env
+
+.venv/
 
 _resources/
 logs/
@@ -6,7 +7,7 @@ sql/
 src_rdv/
 
 __pycache__/
-.venv/
 
 backlog.md
 config.yaml
+.env

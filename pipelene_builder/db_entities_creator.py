@@ -1,7 +1,7 @@
 import os
 
 import oracledb
-import psycopg2
+import psycopg
 
 
 def execute_sql_file(cursor, file_path, logger):
@@ -13,7 +13,7 @@ def execute_sql_file(cursor, file_path, logger):
         cursor.execute(sql)
 
 
-def create_or_update_entities(ddl_dir, gp_db_config, logger):
+def create_gp_entities(ddl_dir, db_config, logger):
     """ """
     gp_ddl_dir = f"{ddl_dir}\\gp"
     sql_files = sorted(file for file in os.listdir(gp_ddl_dir) if file.endswith(".sql"))
@@ -23,7 +23,7 @@ def create_or_update_entities(ddl_dir, gp_db_config, logger):
         return
 
     try:
-        conn = psycopg2.connect(**gp_db_config)
+        conn = psycopg.connect(**db_config)
         conn.autocommit = True  # Автоматическое применение транзакций
         cursor = conn.cursor()
 

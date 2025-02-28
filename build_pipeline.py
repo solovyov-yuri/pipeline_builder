@@ -1,10 +1,10 @@
 import sys
 
-from config import config
-from db_entities_creator import create_gp_entities, create_oracle_entities
-from logger import LoggerConfig
-from pipline_builder import build_pipeline_with_progress, copy_files
-from resource_creator import create_resources
+from src.config import config
+from src.db_entities_creator import create_gp_entities, create_oracle_entities
+from src.logger import LoggerConfig
+from src.pipline_builder import build_pipeline_with_progress, copy_files
+from src.resource_creator import create_resources
 
 # Setup logger
 logger = LoggerConfig.get_logger("Pipeline Builder")

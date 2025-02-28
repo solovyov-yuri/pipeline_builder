@@ -4,7 +4,7 @@ import sys
 
 from config import config
 from db_entities_creator import create_or_update_entities, create_oracle_entities
-from pipline_builder import build_pipeline, copy_files
+from pipline_builder import build_pipeline, copy_files, get_files_from_dir
 from resource_creator import create_resources
 
 
@@ -26,7 +26,7 @@ ceh_res = config.get("resource_providers.ceh")
 server_conn = config.get("server")
 
 # Directories
-flow_dir = f"{os.getcwd()}/src_rdv"
+flow_dir = config.get("directories.local.flow")
 remote_dir = config.get("directories.remote")[dev_env]
 
 
@@ -95,7 +95,7 @@ remote_dir = config.get("directories.remote")[dev_env]
 #     required_db_configs = []
 
 #     for var in required_vars + required_dirs + required_db_configs:
-#         if not os.getenv(var):
+#         if not os.getenv(var):config.example.yamlconfig.example.yaml
 #             logger.warning(f"⚠️ Environment variable {var} is not set!")
 
 

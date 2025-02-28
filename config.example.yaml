@@ -7,7 +7,8 @@ server:
 
 directories:
   local:
-    log: "/path/to/log"
+    flow: "src_rdv"
+    log: "log"
     ddl: "/path/to/ddl"
     uni_res: "/path/to/uni_res"
     ceh_res: "/path/to/ceh_res"

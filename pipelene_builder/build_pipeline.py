@@ -4,7 +4,7 @@ import sys
 from config import config
 from logger import LoggerConfig
 
-# from db_entities_creator import create_or_update_entities, create_oracle_entities
+from db_entities_creator import create_or_update_entities, create_oracle_entities
 from pipline_builder import build_pipeline, build_pipeline_with_progress, copy_files
 from resource_creator import create_resources
 
@@ -19,16 +19,19 @@ gp_config = config.get("database.greenplum")
 oracle_config = config.get("database.oracle")
 
 # Resource providers api's
-uni_res = config.get("resource_providers.uni")
-ceh_res = config.get("resource_providers.ceh")
+uni_res_url = config.get(f"resource_provider.{dev_env}.uni_res")
+ceh_res_url = config.get(f"resource_provider.{dev_env}.ceh_res")
 
 # Server connection
 server_conn = config.get("server")
 
 # Directories
-flow_dir = f"{os.getcwd()}/src_rdv"
+flow_dir = config.get("directories.local.flow")
 remote_dir = config.get("directories.remote")[dev_env]
+uni_res_dir = config.get("directories.local.uni_res")
+ceh_res_dir = config.get("directories.local.ceh_res")
 
+ssl_cert_path = config.get("ssl.cert_path")
 
 # DEV_ENVIRONMENTS = {
 #     "zi5": {
@@ -95,7 +98,7 @@ remote_dir = config.get("directories.remote")[dev_env]
 #     required_db_configs = []
 
 #     for var in required_vars + required_dirs + required_db_configs:
-#         if not os.getenv(var):
+#         if not os.getenv(var):config.example.yamlconfig.example.yaml
 #             logger.warning(f"⚠️ Environment variable {var} is not set!")
 
 
@@ -104,19 +107,13 @@ def main():
     logger.info("Builder start working...")
 
     # Copiy files to remote server
-    copy_files(server_conn, flow_dir, remote_dir, logger)
+    # copy_files(server_conn, flow_dir, remote_dir, logger)
 
-    # # Create UNI resources
-    # if UNI_RES:
-    #     create_resources(api_url=UNI_RES, resources_folder=UNI_RES_DIR, cert_path=CERT_PATH, logger=logger)
-    # else:
-    #     logger.warning("⚠️ UNI_RES is not set! Skipping resource creation.")
+    # Create UNI resources
+    create_resources(uni_res_url, uni_res_dir, logger, ssl_cert_path)
 
     # # Create CEH resources
-    # if CEH_RES:
-    #     create_resources(api_url=CEH_RES, resources_folder=CEH_RES_DIR, cert_path=CERT_PATH, logger=logger)
-    # else:
-    #     logger.warning("⚠️ CEH_RES is not set! Skipping resource creation.")
+    create_resources(ceh_res_url, ceh_res_dir, logger, ssl_cert_path)
 
     # # Create tables in database
     # create_or_update_entities(DDL_DIR, GP_CONFIG, logger)

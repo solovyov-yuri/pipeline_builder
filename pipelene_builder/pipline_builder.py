@@ -85,7 +85,7 @@ def build_pipeline(server_config: dict[str, int], dev_env: str, logger: Logger):
             log_file.write(stderr_text)
 
         ssh.close()
-        logger.info("Pipeline built successfully, log saved to logs/")
+        logger.info("✅ Pipeline built successfully, log saved to logs/")
 
     except gaierror as e:
         logger.error(f"❌ Connection error: {e}. Ensure your VPN is on and the host address is correct.")
@@ -96,10 +96,9 @@ def show_progress():
     start_time = time.time()
     while not progress_done:
         elapsed = int(time.time() - start_time)
-        sys.stdout.write(f"\r⏳ Building pipeline... {elapsed} sec")
+        sys.stdout.write(f"\r⏳ Building pipeline... {elapsed} sec. Estimated time to build ~5 min")
         sys.stdout.flush()
         time.sleep(1)
-    print("\n✅ Build completed!")
 
 
 def build_pipeline_with_progress(server_config, dev_env, logger):
